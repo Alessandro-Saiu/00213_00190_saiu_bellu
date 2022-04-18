@@ -18,6 +18,9 @@ e agli articoli della sezione Europa.
 
 ## How do I get set up? ###
 
+!!! IMPORTANTE !!!
+Nel commit sono stati iseriti molti file. Il file da aprire e lanciare è " main.py ", da lì è possibile richiamare tutte le operazioni dagli altri file.
+
 ### Summary of set up:
 * Scaricare da github geckodriver e posizionarlo nella cartella contenente python, accedere con le proprie credenziali sul
 browser firefox al Financial Times e installare l'estensione "i don't care about cookies"
