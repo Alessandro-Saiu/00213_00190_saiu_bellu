@@ -1,17 +1,16 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib.parse
-from crawler import Economist_class
+from crawler import Economist
 from requests_html import HTMLSession
 import pandas as pd
 
-
 """------------------------------------------------------------------------------------------------------------------"""
-# questa classe serve per estrarre il contenuto di un articolo dall' Economist
 
 
+# questa classe serve per estrarre il contenuto di un articolo dall' Economist, gli attributi di istanza sono
+# definiti in modo che sia possibile ciclare all'interno della lista di collegamenti fornita dal crawler
 class Estrattore:
-
     def __init__(self, href=[]):
         self.href = href
 
@@ -28,9 +27,8 @@ class Estrattore:
 
     i = 0
 
-# Questo metodo crea una url completa partendo dalla lista di url parziali generati dal crawler e gli applica
-# direttamente la funzione request
-
+    # Questo metodo crea una url completa partendo dalla lista di url parziali generati dal crawler e gli applica
+    # direttamente la funzione request
     def creazione_richieste(self):
         url_base = 'https://www.economist.com'
         try:
@@ -44,9 +42,9 @@ class Estrattore:
         except Exception as e:
             return print(e)
 
-# Questo metodo prende una lista di richieste e permette di navigare nei contenuti della pagina tramite la libreria
-# beautiful soup per estrarre il testo vero e proprio che viene infine inserito come stringa in una lista 'risultato'
-
+    # Questo metodo prende una lista di richieste e permette di navigare nei contenuti della pagina tramite la
+    # libreria beautiful soup per estrarre il testo vero e proprio che viene infine inserito come stringa in una
+    # lista 'risultato'
     def creazione_soup(self, lista_url=[]):
         try:
             risultato = []
@@ -64,9 +62,8 @@ class Estrattore:
                         print('articolo estratto')
                         risultato.append(contenuto.text)
 
-# Alcuni articoli fanno un utilizzo pesante dei javascript e sono difficilmente estraibili con Beautiful soup ho quindi
-# creato una sessione su cronium
-
+                    # Alcuni articoli fanno un utilizzo pesante dei javascript e sono difficilmente estraibili con
+                    # Beautiful soup ho quindi creato una sessione su cronium
                     elif soup.select('div', class_='article-text ds-container svelte-o3pylb'):
                         try:
                             contenuto = []
@@ -89,28 +86,25 @@ class Estrattore:
             return print(e)
 
 
+# La classe restituisce infine una lista contenente tutti gli articoli estratti come una stringa
+
+
 """------------------------------------------------------------------------------------------------------------------"""
-# la classe viene fatta iterare fra le diverse pagine della sezione europa del The Economist così da inserire in un
-# unica lista tutti gli url di diverse pagine che verranno passate al metodo di estrazione
+# la classe viene fatta iterare fra le diverse pagine della sezione europa del The Economist, si ricordi infatti che
+# il crawler restituisce una lista di liste, così da inserire in un unica lista tutti i collegamenti degli articoli che
+# devono essere passati al metodo di estrazione
 
 lista_url_def = []
 
-Economist = Estrattore(Economist_class.ciclo_pagine())
+Economist = Estrattore(Economist.ciclo_pagine())
 
 for lista in Economist.href:
     lista_url_def.append(Economist.creazione_richieste())
     Economist.i += 1
 
-articoli_TE = Economist.creazione_soup(lista_url_def)  # da chiamare nel main
+articoli_TE = Economist.creazione_soup(lista_url_def)
 
-df = pd.DataFrame(articoli_TE)
-df.to_markdown('Articoli economist.md')
+te_df = pd.DataFrame(articoli_TE)
 
-
-
-
-
-
-
-
-
+# dopo aver estratto tutti gli articoli delle diverse pagine si inserisce tutto in un dataframe così da semplificare le
+# successive manipolazioni

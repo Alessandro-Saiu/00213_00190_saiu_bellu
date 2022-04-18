@@ -2,47 +2,36 @@
 
 This README would normally document whatever steps are necessary to get your application up and running.
 
-### What is this repository for? ###
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+## What is this repository for? ##
+### Quick summary:
 
-*In questo progetto estrarremo dei dati testuali da due fonti diverse: In primo luogo estrarremo degli articoli 
-di giornale attraverso il web scraping sul sito 'The economist'; in secondo luogo estrarremo dei tweet delle 3 
-persone più influenti nel panorama economico europeo attraverso una libreria già implementata in python chiamata 'Twint'.
+*Lo scopo di questo progetto è di estrarre dei dati testuali dalle testate economiche "The Economist" e "Financial Times",
+in particolare gli articoli che sono stati pubblicati dalle stesse nell'arco di marzo 2022 a ottobre 2021.
 
-*Procederemo con una sentiment analysis per quanto riguarda i tweet. L'output sarà un modello addestrato ad individuare 
-la positività o la negatività di ogni nuovo tweet.
-
-*Con gli articoli estratti elaboreremo un topic model: Il modello prenderà in input i nostri articoli e sarà capace 
-di restituire in output in output non solo i topic (ossia di cosa gli articoli stanno parlando), ma anche per ogni nuovo 
-articolo ci darà la probabilità che questo appartenga o meno ad uno dei topic individuati.
+*Si procede quindi a operare sugli stessi sia una sentiment analysis, così da determinare la percentuale di articoli positivi e negativi
+che sono stati pubblicati in un dato mese, sia una topic modelling che restituisca i principali temi trattati.
  
-*L'output di questi due modelli sarà utilizzato come input per la creazione di un modello di regressione lineare: 
-I due modelli saranno i predittori del modello e la variabile di risposta sarà il 'tasso overnight' della BCE.
- 
-*In conclusione, ci aspettiamo che l'analisi dei tweet e degli articoli vada realmente ad influenzare il tasso overnight
-e predirne gli andamenti futuri con un'accuratezza dell'80% minimo.
-
-*Questa è una linea giuda del nostro lavoro, ma potrebbe essere soggetta a cambiamenti durante il precorso.
+*L'output finale del progetto è un dataframe che contenga per ogni mese il valore dell'inflazione, il valore dell'aggregato monetario
+M2, i risultati della sentiment analysis e del topic modelling il tutto riferito ai valori aggregati per i paesi dell' EU
+e agli articoli della sezione europa.
 
 
-### How do I get set up? ###
+## How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+### Summary of set up:
+* Scaricare da github geckodriver e posizionarlo nella cartella contenente python, accedere con le proprie credenziali sul
+browser firefox al Financial Times e installare l'estensione "i don't care about cookies"
+* Per funzionare wordcloud ha necessità di un compilatore C++, su windows si può installare visual studio
+### Dependencies:
+* bs4
+* requests
+* requests-html
+* selenium
+* matplotlib
+* pandas
+* numpy
+* sklearn
+* urllib.parse
+* wordcloud
+* nltk
 
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact

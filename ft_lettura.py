@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib.parse
-from crawler import FinancialTimes_class
+from crawler import FinancialTimes
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
@@ -12,9 +12,8 @@ import pandas as pd
 """------------------------------------------------------------------------------------------------------------------"""
 
 
-# questa classe serve per estrarre il contenuto di un articolo dal Financial times
-
-
+# questa classe serve per estrarre il contenuto di un articolo del Financial Times, gli attributi d' istanza sono
+# definiti in modo che sia possibile ciclare all'interno della lista di collegamenti fornita dal crawler
 class Estrattore:
 
     def __init__(self, href=[]):
@@ -32,19 +31,22 @@ class Estrattore:
             return self.href[self._indice]
 
     i = 0
-    profile_path = r'C:\Users\Alessandro\AppData\Roaming\Mozilla\Firefox\Profiles\klopbxgh.default-release'
-    # ff_profilo = webdriver.FirefoxProfile(profile_path)
-    # driver = webdriver.Firefox(firefox_profile=ff_profilo)
+
+    # IMPORTANTE: molti degli articoli del FT richiedono una sottoscrizione e non è possibile estrarli con bs4
+    # per far funzionare questo programma è quindi necessario scaricare geckodriver e copiarlo nella cartella di python
+    # dopodiché bisognerà caricare il profilo personale di firefox, si noti che il path scritto qua andrà sostituito con
+    # quello della macchina dove sta girando il programma, il motivo è che si suppone che nel profilo siano salvate le
+    # credenziali di accesso e si sia installata l'estensione "i don't care about cookies" che rimuove automaticamente
+    # i pop-up per l'accettazione dei cookies, in linea puramente teorica in assenza di credenziali si potrebbero
+    # visionare gli articoli anche installando l'estensione "Bypass Paywalls Clean"
+    profile_path = r'C:\Users\utente\AppData\Roaming\Mozilla\Firefox\Profiles\nt4lo6kh.default-release'
     ffOptions = Options()
     ffOptions.add_argument("-profile")
     ffOptions.add_argument(profile_path)
     driver = webdriver.Firefox(options=ffOptions)
 
-    # C:\Users\Alessandro\AppData\Local\Programs\Python\Python310\geckodriver.exe
-
     # Questo metodo crea una url completa partendo dalla lista di url parziali generati dal crawler e gli applica
     # direttamente la funzione request
-
     def creazione_richieste(self):
         url_base = 'https://www.ft.com'
         try:
@@ -61,7 +63,6 @@ class Estrattore:
     # Questo metodo prende una lista di richieste e permette di navigare nei contenuti della pagina tramite la
     # libreria beautiful soup per estrarre il testo vero e proprio che viene infine inserito come stringa in una
     # lista 'risultato'
-
     def creazione_soup(self, lista_url=[]):
         try:
             risultato = []
@@ -79,18 +80,14 @@ class Estrattore:
                         print(definitivo)
                         risultato.append([definitivo])
 
-                    # buona parte degli articoli sono protetti da un paywall ho quindi proceduto a visualizzare il
-                    # contenuto tramite il pc nel quale ho accesso agli stessi creando per ogni articolo una sessione
-                    # sul mio browser
-
+                    # gli articoli non estraibili con bs4 sono aperti direttamente su firefox ed estratti tramite XPATH
+                    # posto che si siano rispettati i requisiti elencati sopra
                     elif soup.select('div', class_="article__content-body n-content-body js-article__content-body"):
                         try:
                             print("\nutilizzo selenium")
                             contenuto = []
                             url = articolo.url
                             self.driver.get(url)
-                            # t = Timer(20.0, )
-                            # t.start()
                             gate = True
                             self.driver.set_page_load_timeout(10)
                             self.driver.implicitly_wait(10)
@@ -98,16 +95,13 @@ class Estrattore:
                                 # necessario refresh per assicurarsi che parta l'estensione per accettare
                                 # automaticamente i cookies
                                 self.driver.refresh()
-                                # faccio scorrere la pagina
+                                # faccio scorrere la pagina così da assicurarsi che venga caricato tutto
                                 self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var "
                                                            "lenOfPage=document.body.scrollHeight;return lenOfPage;")
                                 corpo = self.driver.find_element(By.XPATH, '/html/body/div/div[2]/div/div/div[2]'
                                                                            '/article/div[3]/div[3]')
                                 paragrafo = corpo.find_elements(By.XPATH, '/html/body/div/div[2]/div/div/div['
                                                                           '2]/article/div[3]/div[3]/div/p')
-
-                                # self.driver.find_element(By.XPATH, '/html/body/div/div[2]/div/div/div[2]'
-                                # '/article/div[3]/div[3]')
                                 for item in paragrafo:
                                     contenuto.append(item.text.strip('\n'))
                                 definitivo = ''.join(contenuto)
@@ -120,7 +114,6 @@ class Estrattore:
                         except TimeoutException:
                             print('\ntroppo lento')
                             continue
-
                     else:
                         print('\nformato html non riconosciuto')
             print(len(risultato))
@@ -129,23 +122,26 @@ class Estrattore:
             return print(e)
 
 
+# La classe restituisce infine una lista contenente tutti gli articoli estratti come una stringa
+
+
 """------------------------------------------------------------------------------------------------------------------"""
-# la classe viene fatta iterare fra le diverse pagine della sezione europa del financial times così da inserire in un
-# unica lista tutti gli url di diverse pagine che verranno passate al metodo di estrazione
+# la classe viene fatta iterare fra le diverse pagine della sezione europa del Financial Times, si ricordi infatti che
+# il crawler restituisce una lista di liste, così da inserire in un unica lista tutti i collegamenti degli articoli
+# che devono essere passati al metodo di estrazione
+
+
+FT = Estrattore(FinancialTimes.ciclo_pagine())
 
 lista_url_def = []
-
-FT = Estrattore(FinancialTimes_class.ciclo_pagine())
 
 for lista in FT.href:
     lista_url_def.append(FT.creazione_richieste())
     FT.i += 1
 
-articoli_FT = FT.creazione_soup(lista_url_def)  # da chiamare nel main
+articoli_FT = FT.creazione_soup(lista_url_def)
 
-df = pd.DataFrame(articoli_FT)
-df.to_markdown('Articoli FT_100.md')
+ft_df = pd.DataFrame(articoli_FT)
 
-# html.js.enhanced.js-focus-visible.mnkdtba.lvpfwhgzuyj body.o-ads-no-mpu.o-ads-no-mpu1.o-ads-no-third-mpu div.n-layout div.n-layout__row.n-layout__row--content
-# div div div.article-content article#site-content.article.article-grid.article-grid--no-full-width-graphics div.article__content.p402_premium div.article__content-body.n-content-body.
-# js-article__content-body div.article__content-body.n-content-body.js-article__content-body p
+# dopo aver estratto tutti gli articoli delle diverse pagine si inserisce tutto in un dataframe così da semplificare le
+# successive manipolazioni
