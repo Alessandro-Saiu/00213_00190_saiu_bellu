@@ -6,14 +6,14 @@ This README would normally document whatever steps are necessary to get your app
 ### Quick summary:
 
 *Lo scopo di questo progetto è di estrarre dei dati testuali dalle testate economiche "The Economist" e "Financial Times",
-in particolare gli articoli che sono stati pubblicati dalle stesse nell'arco di marzo 2022 a ottobre 2021.
+in particolare gli articoli che sono stati pubblicati dalle stesse nel periodo che va da marzo 2022 a ottobre 2021.
 
 *Si procede quindi a operare sugli stessi sia una sentiment analysis, così da determinare la percentuale di articoli positivi e negativi
 che sono stati pubblicati in un dato mese, sia una topic modelling che restituisca i principali temi trattati.
  
 *L'output finale del progetto è un dataframe che contenga per ogni mese il valore dell'inflazione, il valore dell'aggregato monetario
 M2, i risultati della sentiment analysis e del topic modelling il tutto riferito ai valori aggregati per i paesi dell' EU
-e agli articoli della sezione europa.
+e agli articoli della sezione Europa.
 
 
 ## How do I get set up? ###
